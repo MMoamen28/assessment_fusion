@@ -3,6 +3,7 @@ import {
   canClaim,
   canAssign,
   canChangeStatus,
+  canChangePriority,
   canComment,
   type Actor,
   type ComplaintState,
@@ -88,6 +89,39 @@ describe("Permissions", () => {
     });
   });
 
+  describe("canChangePriority", () => {
+    it("returns true for assignee on non-terminal status", () => {
+      const complaint: ComplaintState = { status: "IN_REVIEW", assigneeId: agentA.id };
+      expect(canChangePriority(agentA, complaint)).toBe(true);
+    });
+
+    it("returns false for non-assignee agent", () => {
+      const complaint: ComplaintState = { status: "IN_REVIEW", assigneeId: agentA.id };
+      expect(canChangePriority(agentB, complaint)).toBe(false);
+    });
+
+    it("returns true for admin on non-terminal status", () => {
+      const complaint: ComplaintState = { status: "IN_REVIEW", assigneeId: agentA.id };
+      expect(canChangePriority(admin, complaint)).toBe(true);
+    });
+
+    it("returns false for unassigned complaint for agent but true for admin", () => {
+      const complaint: ComplaintState = { status: "OPEN", assigneeId: null };
+      expect(canChangePriority(agentA, complaint)).toBe(false);
+      expect(canChangePriority(admin, complaint)).toBe(true);
+    });
+
+    it("returns false on terminal status for both admin and agent", () => {
+      const closed: ComplaintState = { status: "CLOSED", assigneeId: agentA.id };
+      const rejected: ComplaintState = { status: "REJECTED", assigneeId: agentA.id };
+
+      expect(canChangePriority(agentA, closed)).toBe(false);
+      expect(canChangePriority(admin, closed)).toBe(false);
+      expect(canChangePriority(agentA, rejected)).toBe(false);
+      expect(canChangePriority(admin, rejected)).toBe(false);
+    });
+  });
+
   describe("canComment", () => {
     it("returns true for IN_REVIEW", () => {
       const complaint: ComplaintState = { status: "IN_REVIEW", assigneeId: agentA.id };
@@ -104,3 +138,4 @@ describe("Permissions", () => {
     });
   });
 });
+

@@ -21,6 +21,13 @@ export function canChangeStatus(actor: Actor, c: ComplaintState, to: Status): bo
   return c.assigneeId === actor.id;
 }
 
+export function canChangePriority(actor: Actor, c: ComplaintState): boolean {
+  if (isTerminal(c.status)) return false;
+  if (isAdmin(actor)) return true;
+  return c.assigneeId === actor.id;
+}
+
 export function canComment(_actor: Actor, c: ComplaintState): boolean {
   return c.status !== "CLOSED";
 }
+
