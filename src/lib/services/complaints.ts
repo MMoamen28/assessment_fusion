@@ -15,7 +15,16 @@ import type {
   CreateComplaintInput,
   ChangeStatusInput,
   ChangePriorityInput,
+  ListQueryInput,
 } from "@/lib/validation/complaint";
+import {
+  staffComplaintListSelect,
+  complaintDetailSelect,
+  assignableUserSelect,
+  type ComplaintDetailDto,
+  type AssignableUserDto,
+} from "./dto";
+
 
 export async function createComplaint(input: CreateComplaintInput) {
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -296,3 +305,115 @@ export async function changePriority(
     return { success: true };
   });
 }
+
+export async function listComplaints(filters: ListQueryInput, actor: SessionUser) {
+  const where: Prisma.ComplaintWhereInput = {};
+
+  if (filters.q) {
+    where.OR = [
+      { reference: { contains: filters.q, mode: "insensitive" } },
+      { title: { contains: filters.q, mode: "insensitive" } },
+      { submitterName: { contains: filters.q, mode: "insensitive" } },
+      { submitterEmail: { contains: filters.q, mode: "insensitive" } },
+    ];
+  }
+
+  if (filters.status && filters.status.length > 0) {
+    where.status = { in: filters.status };
+  }
+
+  if (filters.priority && filters.priority.length > 0) {
+    where.priority = { in: filters.priority };
+  }
+
+  if (filters.assignee) {
+    if (filters.assignee === "me") {
+      where.assigneeId = actor.id;
+    } else if (filters.assignee === "unassigned") {
+      where.assigneeId = null;
+    } else {
+      where.assigneeId = filters.assignee;
+    }
+  }
+
+  if (filters.category) {
+    where.category = filters.category;
+  }
+
+  let orderBy: Prisma.ComplaintOrderByWithRelationInput[];
+  if (filters.sort === "oldest") {
+    orderBy = [{ createdAt: "asc" }, { id: "asc" }];
+  } else if (filters.sort === "priority") {
+    orderBy = [{ priority: "desc" }, { createdAt: "desc" }, { id: "desc" }];
+  } else {
+    orderBy = [{ createdAt: "desc" }, { id: "desc" }];
+  }
+
+  const page = filters.page;
+  const pageSize = filters.pageSize;
+  const skip = (page - 1) * pageSize;
+
+  const [items, total] = await prisma.$transaction([
+    prisma.complaint.findMany({
+      where,
+      select: staffComplaintListSelect,
+      orderBy,
+      skip,
+      take: pageSize,
+    }),
+    prisma.complaint.count({ where }),
+  ]);
+
+  return { items, total, page, pageSize };
+}
+
+export async function getComplaintDetail(id: string): Promise<ComplaintDetailDto> {
+  const complaint = await prisma.complaint.findUnique({
+    where: { id },
+    select: complaintDetailSelect,
+  });
+
+  if (!complaint) {
+    throw new NotFoundError("Complaint not found");
+  }
+
+  return complaint;
+}
+
+export async function getStats(): Promise<Record<string, number>> {
+  const [grouped, unassignedOpen] = await Promise.all([
+    prisma.complaint.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+    }),
+    prisma.complaint.count({
+      where: {
+        status: "OPEN",
+        assigneeId: null,
+      },
+    }),
+  ]);
+
+  const counts: Record<string, number> = {
+    OPEN: 0,
+    IN_REVIEW: 0,
+    RESOLVED: 0,
+    CLOSED: 0,
+    REJECTED: 0,
+    unassignedOpen,
+  };
+
+  for (const group of grouped) {
+    counts[group.status] = group._count._all;
+  }
+
+  return counts;
+}
+
+export async function getAssignableUsers(): Promise<AssignableUserDto[]> {
+  return prisma.user.findMany({
+    select: assignableUserSelect,
+    orderBy: { name: "asc" },
+  });
+}
+
