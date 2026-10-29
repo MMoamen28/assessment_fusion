@@ -1,10 +1,9 @@
 import type { Status } from "@prisma/client";
 
-/** The allowed status graph. Anything not listed here is forbidden. */
 export const TRANSITIONS: Record<Status, readonly Status[]> = {
   OPEN: ["IN_REVIEW", "REJECTED"],
   IN_REVIEW: ["RESOLVED", "REJECTED"],
-  RESOLVED: ["CLOSED", "IN_REVIEW"], // IN_REVIEW from RESOLVED = reopen
+  RESOLVED: ["CLOSED", "IN_REVIEW"],
   CLOSED: [],
   REJECTED: [],
 };

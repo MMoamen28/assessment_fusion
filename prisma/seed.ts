@@ -15,17 +15,14 @@ function hoursAfter(date: Date, hours: number): Date {
 async function main() {
   console.log("Seeding database...");
 
-  // 1. Delete all rows in required order for clean re-runnability
   await prisma.activity.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.complaint.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
 
-  // 2. Hash password with bcrypt cost 10
   const passwordHash = await hash("Password123!", 10);
 
-  // 3. Create users
   const admin = await prisma.user.create({
     data: {
       email: "admin@example.com",
@@ -55,9 +52,7 @@ async function main() {
 
   console.log(`Created 3 users: ${admin.email}, ${agent1.email}, ${agent2.email}`);
 
-  // 4. Create 10 complaints with realistic data spread over last 30 days
   const complaintSeeds = [
-    // 4 x OPEN (unassigned, mixed priorities)
     {
       title: "Double billed for monthly enterprise subscription",
       description: "Our company account was charged twice on the 1st of the month for invoice INV-9812. Requesting refund for the duplicate charge.",
@@ -102,8 +97,6 @@ async function main() {
       assigneeId: null,
       createdAt: daysAgo(4),
     },
-
-    // 2 x IN_REVIEW (one assigned to agent1, one to agent2)
     {
       title: "Unauthorized charge on quarterly subscription renewal",
       description: "Account was billed for premium analytics add-on that was explicitly cancelled before the renewal cutoff date.",
@@ -126,8 +119,6 @@ async function main() {
       assigneeId: agent2.id,
       createdAt: daysAgo(11),
     },
-
-    // 2 x RESOLVED (assigned)
     {
       title: "Defective cooling fan on industrial network switch",
       description: "Unit began overheating immediately after installation. Replacement cooling unit was dispatched and verified functional.",
@@ -150,8 +141,6 @@ async function main() {
       assigneeId: agent2.id,
       createdAt: daysAgo(19),
     },
-
-    // 1 x CLOSED (assigned)
     {
       title: "Portal login failure after credential migration",
       description: "User was unable to log in following authentication service migration. Secure password reset link was issued and confirmed working.",
@@ -163,8 +152,6 @@ async function main() {
       assigneeId: agent1.id,
       createdAt: daysAgo(29),
     },
-
-    // 1 x REJECTED (assigned)
     {
       title: "Request for full refund on out-of-warranty accessory",
       description: "Customer requested full reimbursement for adapter cables purchased 3 years ago; rejected per standard terms.",
@@ -199,7 +186,6 @@ async function main() {
       },
     });
 
-    // Initial CREATED activity
     await prisma.activity.create({
       data: {
         complaintId: complaint.id,
@@ -214,7 +200,6 @@ async function main() {
       },
     });
 
-    // If assigned, log ASSIGNED activity and comments
     if (item.assigneeId) {
       const assignedAt = hoursAfter(item.createdAt, 2);
       await prisma.activity.create({
