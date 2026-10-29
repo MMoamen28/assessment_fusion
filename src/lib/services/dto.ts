@@ -1,4 +1,4 @@
-import type { Status, Priority, Role, ActivityAction, Prisma } from "@prisma/client";
+import type { Status, Priority, Prisma } from "@prisma/client";
 
 export const staffComplaintListSelect = {
   id: true,

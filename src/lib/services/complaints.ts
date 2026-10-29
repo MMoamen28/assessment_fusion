@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateReference, generatePublicToken } from "@/lib/ids";
-import { canClaim, canAssign, canChangeStatus, canChangePriority } from "@/lib/domain/permissions";
+import { canAssign, canChangeStatus, canChangePriority } from "@/lib/domain/permissions";
 import { checkTransition } from "@/lib/domain/workflow";
 import {
   NotFoundError,
