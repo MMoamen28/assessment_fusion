@@ -32,6 +32,7 @@ enum ActivityAction {
   ASSIGNED
   STATUS_CHANGED
   COMMENTED
+  PRIORITY_CHANGED
 }
 
 model User {
@@ -79,6 +80,7 @@ model Complaint {
   @@index([status])
   @@index([assigneeId])
   @@index([createdAt])
+  @@index([priority])
 }
 
 model Comment {
