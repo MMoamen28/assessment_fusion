@@ -1,69 +1,48 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div>
+      <div style={{ marginBottom: "2rem" }}>
+        <h1 style={{ fontSize: "1.875rem", fontWeight: "700", marginBottom: "0.5rem" }}>
+          Complaints Management Portal
+        </h1>
+        <p style={{ color: "var(--text-muted)", fontSize: "1.0625rem" }}>
+          Submit public service complaints, track status with your reference number, or sign in to manage tickets.
+        </p>
+      </div>
+
+      <div className="card-grid">
+        <div className="card">
+          <h2 className="card-title">Submit a Complaint</h2>
+          <p className="card-desc">
+            File a new issue regarding billing, products, delivery, or public services.
           </p>
+          <Link href="/submit" className="btn btn-primary">
+            Submit complaint &rarr;
+          </Link>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="card">
+          <h2 className="card-title">Track a Complaint</h2>
+          <p className="card-desc">
+            Check the live progress, status updates, and public notes on an existing ticket.
+          </p>
+          <Link href="/track" className="btn btn-secondary">
+            Track status &rarr;
+          </Link>
         </div>
-      </main>
+
+        <div className="card">
+          <h2 className="card-title">Staff Portal</h2>
+          <p className="card-desc">
+            Staff agents and administrators sign in to review, claim, assign, and resolve tickets.
+          </p>
+          <Link href="/login" className="btn btn-secondary">
+            Staff sign in &rarr;
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
