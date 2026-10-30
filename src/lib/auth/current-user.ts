@@ -18,6 +18,14 @@ export async function requireUser(): Promise<SessionUser> {
   return user;
 }
 
+export async function requireStaff(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (user.role === "CUSTOMER") {
+    throw new ForbiddenError("Staff access required");
+  }
+  return user;
+}
+
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await requireUser();
   if (user.role !== "ADMIN") {

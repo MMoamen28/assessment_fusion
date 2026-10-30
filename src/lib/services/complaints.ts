@@ -105,6 +105,9 @@ export async function createComplaint(
 }
 
 export async function claimComplaint(actor: SessionUser, id: string) {
+  if (actor.role === "CUSTOMER") {
+    throw new ForbiddenError("Customers cannot claim complaints");
+  }
   const result = await prisma.$transaction(async (tx) => {
     // Atomic claim via conditional UPDATE: PostgreSQL row-level locks the row and matches only
     // if status is OPEN and assigneeId is null. In concurrent claim attempts, only the first
@@ -187,6 +190,9 @@ export async function assignComplaint(
     const assignee = await tx.user.findUnique({ where: { id: assigneeId } });
     if (!assignee) {
       throw new NotFoundError("Assignee not found");
+    }
+    if (assignee.role === "CUSTOMER") {
+      throw new ForbiddenError("Cannot assign complaint to a customer");
     }
 
     isOpening = complaint.status === "OPEN";
@@ -499,6 +505,7 @@ export async function getStats(): Promise<Record<string, number>> {
 
 export async function getAssignableUsers(): Promise<AssignableUserDto[]> {
   return prisma.user.findMany({
+    where: { role: { in: ["ADMIN", "AGENT"] } },
     select: assignableUserSelect,
     orderBy: { name: "asc" },
   });

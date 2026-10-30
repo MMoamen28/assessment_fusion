@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login, ApiClientError } from "@/lib/api/client";
 import { Field } from "@/components/ui/Field";
@@ -20,8 +21,12 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      router.push("/dashboard");
+      const res = await login(email, password);
+      if (res.user.role === "CUSTOMER") {
+        router.push("/my-complaints");
+      } else {
+        router.push("/dashboard");
+      }
       router.refresh();
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -70,6 +75,13 @@ export function LoginForm() {
         >
           Sign in
         </Button>
+      </div>
+
+      <div style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.875rem", color: "var(--color-muted)" }}>
+        New citizen user?{" "}
+        <Link href="/register" style={{ color: "var(--color-primary)", textDecoration: "underline" }}>
+          Create a customer account
+        </Link>
       </div>
     </form>
   );

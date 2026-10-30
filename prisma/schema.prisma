@@ -8,6 +8,7 @@ datasource db {
 }
 
 enum Role {
+  CUSTOMER
   AGENT
   ADMIN
 }
@@ -40,7 +41,7 @@ model User {
   email        String      @unique
   name         String
   passwordHash String
-  role         Role        @default(AGENT)
+  role         Role        @default(CUSTOMER)
   createdAt    DateTime    @default(now())
   assigned     Complaint[] @relation("Assignee")
   comments     Comment[]

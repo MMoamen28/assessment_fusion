@@ -15,17 +15,28 @@ async function UserNav() {
 
   if (!user) {
     return (
-      <Link href="/login" className="nav-link">
-        Staff login
-      </Link>
+      <>
+        <Link href="/register" className="nav-link">
+          Register
+        </Link>
+        <Link href="/login" className="nav-link">
+          Sign in
+        </Link>
+      </>
     );
   }
 
   return (
     <>
-      <Link href="/dashboard" className="nav-link">
-        Dashboard
-      </Link>
+      {user.role === "CUSTOMER" ? (
+        <Link href="/my-complaints" className="nav-link">
+          My complaints
+        </Link>
+      ) : (
+        <Link href="/dashboard" className="nav-link">
+          Dashboard
+        </Link>
+      )}
       <div className="nav-user">
         <span className="user-badge">
           <span className="user-name">{user.name}</span>

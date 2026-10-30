@@ -12,6 +12,9 @@ export default async function StaffLayout({
   if (!user) {
     redirect("/login");
   }
+  if (user.role === "CUSTOMER") {
+    redirect("/my-complaints");
+  }
 
   return <>{children}</>;
 }

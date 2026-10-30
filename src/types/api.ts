@@ -1,4 +1,4 @@
-export type Role = "AGENT" | "ADMIN";
+export type Role = "CUSTOMER" | "AGENT" | "ADMIN";
 export type Status = "OPEN" | "IN_REVIEW" | "RESOLVED" | "CLOSED" | "REJECTED";
 export type Priority = "LOW" | "MEDIUM" | "HIGH";
 export type ActivityAction =

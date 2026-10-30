@@ -11,9 +11,15 @@ import { Alert } from "@/components/ui/Alert";
 import { COMPLAINT_CATEGORIES } from "@/lib/domain/constants";
 import type { SubmitComplaintResponse } from "@/types/api";
 
-export function SubmitComplaintForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+export function SubmitComplaintForm({
+  initialName = "",
+  initialEmail = "",
+}: {
+  initialName?: string;
+  initialEmail?: string;
+} = {}) {
+  const [name, setName] = useState(initialName);
+  const [email, setEmail] = useState(initialEmail);
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

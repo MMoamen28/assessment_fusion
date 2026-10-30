@@ -13,6 +13,7 @@ describe("Permissions", () => {
   const admin: Actor = { id: "admin1", role: "ADMIN" };
   const agentA: Actor = { id: "agentA", role: "AGENT" };
   const agentB: Actor = { id: "agentB", role: "AGENT" };
+  const customer: Actor = { id: "customer1", role: "CUSTOMER" };
 
   describe("canClaim", () => {
     it("returns true for OPEN and unassigned complaint", () => {
@@ -137,5 +138,29 @@ describe("Permissions", () => {
       expect(canComment(admin, complaint)).toBe(false);
     });
   });
-});
 
+  describe("Customer role restrictions", () => {
+    const openComplaint: ComplaintState = { status: "OPEN", assigneeId: null };
+    const inReviewComplaint: ComplaintState = { status: "IN_REVIEW", assigneeId: agentA.id };
+
+    it("forbids customer from claiming", () => {
+      expect(canClaim(customer, openComplaint)).toBe(false);
+    });
+
+    it("forbids customer from assigning", () => {
+      expect(canAssign(customer, openComplaint)).toBe(false);
+    });
+
+    it("forbids customer from changing status", () => {
+      expect(canChangeStatus(customer, inReviewComplaint, "RESOLVED")).toBe(false);
+    });
+
+    it("forbids customer from changing priority", () => {
+      expect(canChangePriority(customer, inReviewComplaint)).toBe(false);
+    });
+
+    it("forbids customer from adding staff comments", () => {
+      expect(canComment(customer, inReviewComplaint)).toBe(false);
+    });
+  });
+});

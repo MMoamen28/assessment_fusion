@@ -197,3 +197,18 @@ export async function createStaffComplaint(input: {
     body: input,
   });
 }
+
+export interface RegisterResponse {
+  user: SessionUserDto;
+}
+
+export async function register(input: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<RegisterResponse> {
+  return api<RegisterResponse>("/api/auth/register", {
+    method: "POST",
+    body: input,
+  });
+}
