@@ -142,7 +142,7 @@ describe("Complaints Workflow Integration", () => {
       changeStatus(
         { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
         complaint.id,
-        { status: "REJECTED", expectedVersion: 1 },
+        { status: "RESOLVED", expectedVersion: 1 },
       ),
     ]);
 

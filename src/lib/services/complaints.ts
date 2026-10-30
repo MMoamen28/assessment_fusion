@@ -134,12 +134,12 @@ export async function assignComplaint(
       throw new NotFoundError("Complaint not found");
     }
 
-    if (complaint.version !== expectedVersion) {
-      throw new ConflictError("Complaint was modified, reload and retry");
-    }
-
     if (!canAssign(actor, complaint)) {
       throw new ForbiddenError("Only admins can assign complaints, and terminal complaints cannot be assigned");
+    }
+
+    if (complaint.version !== expectedVersion) {
+      throw new ConflictError("Complaint was modified, reload and retry");
     }
 
 
@@ -213,12 +213,12 @@ export async function changeStatus(
       throw new NotFoundError("Complaint not found");
     }
 
-    if (complaint.version !== input.expectedVersion) {
-      throw new ConflictError("Complaint was modified, reload and retry");
-    }
-
     if (!canChangeStatus(actor, complaint, input.status)) {
       throw new ForbiddenError("You are not allowed to change the status of this complaint");
+    }
+
+    if (complaint.version !== input.expectedVersion) {
+      throw new ConflictError("Complaint was modified, reload and retry");
     }
 
 
@@ -281,12 +281,12 @@ export async function changePriority(
       throw new NotFoundError("Complaint not found");
     }
 
-    if (complaint.version !== input.expectedVersion) {
-      throw new ConflictError("Complaint was modified, reload and retry");
-    }
-
     if (!canChangePriority(actor, complaint)) {
       throw new ForbiddenError("You are not allowed to change priority of this complaint");
+    }
+
+    if (complaint.version !== input.expectedVersion) {
+      throw new ConflictError("Complaint was modified, reload and retry");
     }
 
 
