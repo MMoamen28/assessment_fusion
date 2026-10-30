@@ -27,3 +27,8 @@ export class InvalidTransitionError extends AppError {
 export class ValidationError extends AppError {
   constructor(details: unknown, message = "Invalid input") { super(400, "VALIDATION_ERROR", message, details); }
 }
+export class RateLimitError extends AppError {
+  constructor(retryAfterSeconds: number, message = "Too many requests. Please try again later.") {
+    super(429, "RATE_LIMITED", message, { retryAfterSeconds });
+  }
+}
