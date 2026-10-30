@@ -62,7 +62,6 @@ export function TrackLookupForm() {
         onChange={(e) => setReference(e.target.value)}
         error={fieldErrors.reference}
         hint="The reference format is CMP-XXXXXX (e.g. CMP-A8B9C2)"
-        placeholder="CMP-A8B9C2"
         disabled={loading}
       />
 
