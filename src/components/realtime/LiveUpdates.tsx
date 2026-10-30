@@ -83,7 +83,7 @@ export function LiveUpdates({ url, fallbackIntervalMs = 30000 }: LiveUpdatesProp
         alignItems: "center",
         gap: "0.375rem",
         fontSize: "0.75rem",
-        color: connected ? "var(--success, #16a34a)" : "var(--text-muted, #64748b)",
+        color: connected ? "var(--success-text, #185334)" : "var(--text-muted, #68635b)",
         verticalAlign: "middle",
       }}
       title={connected ? "Connected to realtime updates" : "Polling fallback active"}
@@ -94,7 +94,7 @@ export function LiveUpdates({ url, fallbackIntervalMs = 30000 }: LiveUpdatesProp
           width: "6px",
           height: "6px",
           borderRadius: "50%",
-          backgroundColor: connected ? "var(--success, #16a34a)" : "var(--warning, #eab308)",
+          backgroundColor: connected ? "var(--success-text, #185334)" : "var(--warning-text, #8a5314)",
         }}
       />
       <span>
