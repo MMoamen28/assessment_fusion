@@ -5,7 +5,7 @@ import { getPublicComplaint } from "@/lib/services/public";
 import { NotFoundError } from "@/lib/errors";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
-import { AutoRefresh } from "@/components/AutoRefresh";
+import { LiveUpdates } from "@/components/realtime/LiveUpdates";
 import { ReplyForm } from "@/components/ReplyForm";
 import { formatDateTime } from "@/lib/format";
 import type { Status } from "@/types/api";
@@ -39,8 +39,6 @@ export default async function TrackTokenPage({ params }: TrackTokenPageProps) {
 
   return (
     <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-      <AutoRefresh intervalMs={30000} />
-
       <div style={{ marginBottom: "1rem" }}>
         <Link href="/track" style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
           &larr; Back to lookup
@@ -66,6 +64,7 @@ export default async function TrackTokenPage({ params }: TrackTokenPageProps) {
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <StatusBadge status={complaint.status} />
             <PriorityBadge priority={complaint.priority} />
+            <LiveUpdates url={`/api/public/complaints/${token}/events`} />
           </div>
         </div>
 

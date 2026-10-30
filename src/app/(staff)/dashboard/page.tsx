@@ -10,6 +10,7 @@ import { listQuerySchema, type ListQueryInput } from "@/lib/validation/complaint
 import { FilterBar } from "@/components/dashboard/FilterBar";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
+import { LiveUpdates } from "@/components/realtime/LiveUpdates";
 import { formatDateTime } from "@/lib/format";
 import type { Status, Priority } from "@/types/api";
 
@@ -134,9 +135,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         }}
       >
         <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: "700", marginBottom: "0.25rem" }}>
-            Staff Dashboard
-          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.25rem" }}>
+            <h1 style={{ fontSize: "1.75rem", fontWeight: "700", margin: 0 }}>
+              Staff Dashboard
+            </h1>
+            <LiveUpdates url="/api/events" />
+          </div>
           <p style={{ color: "var(--text-muted)", fontSize: "0.9375rem" }}>
             Welcome back, <strong>{user.name}</strong> ({user.email}) &bull;{" "}
             <span className="user-role">{user.role}</span>

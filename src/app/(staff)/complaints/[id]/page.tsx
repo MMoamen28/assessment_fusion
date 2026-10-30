@@ -21,6 +21,7 @@ import { StatusForm } from "@/components/complaint/StatusForm";
 import { PriorityForm } from "@/components/complaint/PriorityForm";
 import { CommentForm } from "@/components/complaint/CommentForm";
 import { CopyTrackingLink } from "@/components/complaint/CopyTrackingLink";
+import { LiveUpdates } from "@/components/realtime/LiveUpdates";
 
 export const instant = false;
 
@@ -146,6 +147,7 @@ export default async function ComplaintDetailPage({ params }: PageProps) {
             </span>
             <StatusBadge status={complaint.status} />
             <PriorityBadge priority={complaint.priority} />
+            <LiveUpdates url={`/api/events?complaintId=${complaint.id}`} />
           </div>
           <h1
             style={{
