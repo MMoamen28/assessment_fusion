@@ -177,3 +177,23 @@ export async function replyToComplaint(
     body: { body },
   });
 }
+
+export interface CreateStaffComplaintResponse {
+  id: string;
+  reference: string;
+  publicToken: string;
+}
+
+export async function createStaffComplaint(input: {
+  submitterName: string;
+  submitterEmail: string;
+  category: string;
+  title: string;
+  description: string;
+  priority?: Priority;
+}): Promise<CreateStaffComplaintResponse> {
+  return api<CreateStaffComplaintResponse>("/api/complaints", {
+    method: "POST",
+    body: input,
+  });
+}

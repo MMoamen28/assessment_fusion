@@ -125,14 +125,26 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <div>
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: "700", marginBottom: "0.25rem" }}>
-          Staff Dashboard
-        </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: "0.9375rem" }}>
-          Welcome back, <strong>{user.name}</strong> ({user.email}) &bull;{" "}
-          <span className="user-role">{user.role}</span>
-        </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <div>
+          <h1 style={{ fontSize: "1.75rem", fontWeight: "700", marginBottom: "0.25rem" }}>
+            Staff Dashboard
+          </h1>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9375rem" }}>
+            Welcome back, <strong>{user.name}</strong> ({user.email}) &bull;{" "}
+            <span className="user-role">{user.role}</span>
+          </p>
+        </div>
+        <Link href="/complaints/new" className="button button-primary">
+          New complaint
+        </Link>
       </div>
 
       {/* Stats Cards Row */}
