@@ -75,6 +75,10 @@ export async function createComplaint(input: CreateComplaintInput) {
 
 export async function claimComplaint(actor: SessionUser, id: string) {
   return prisma.$transaction(async (tx) => {
+    // Atomic claim via conditional UPDATE: PostgreSQL row-level locks the row and matches only
+    // if status is OPEN and assigneeId is null. In concurrent claim attempts, only the first
+    // transaction modifies the row (count = 1); all subsequent callers get count = 0 and fail
+    // with ConflictError without race conditions or dirty reads.
     const updated = await tx.complaint.updateMany({
       where: {
         id,
