@@ -1,3 +1,4 @@
+name: complaints-system
 services:
   db:
     image: postgres:16
@@ -5,11 +6,12 @@ services:
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
-      POSTGRES_DB: complaints
+      POSTGRES_DB: complaints_dev
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
 
 volumes:
   pgdata:
