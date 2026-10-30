@@ -44,7 +44,7 @@ export function LiveUpdates({ url, fallbackIntervalMs = 30000 }: LiveUpdatesProp
         }
       };
     } catch {
-      setConnected(false);
+      // EventSource instantiation failed
     }
 
     // Polling fallback when disconnected

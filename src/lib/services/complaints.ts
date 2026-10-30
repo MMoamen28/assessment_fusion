@@ -257,7 +257,7 @@ export async function changeStatus(
   id: string,
   input: ChangeStatusInput,
 ) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const complaint = await tx.complaint.findUnique({ where: { id } });
     if (!complaint) {
       throw new NotFoundError("Complaint not found");
