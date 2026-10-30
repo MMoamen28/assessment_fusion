@@ -119,7 +119,6 @@ export interface ApiErrorBody {
 export interface SubmitComplaintInput {
   submitterName: string;
   submitterEmail: string;
-  submitterPhone?: string;
   category: string;
   title: string;
   description: string;

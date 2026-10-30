@@ -16,7 +16,6 @@ export function validateComplaintId(id: string): string {
 export const createComplaintSchema = z.object({
   submitterName: z.string().trim().min(1).max(100),
   submitterEmail: z.string().trim().email().toLowerCase().max(255),
-  submitterPhone: z.string().trim().max(30).optional(),
   category: z.string().trim().min(1).max(100),
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().min(10).max(5000),

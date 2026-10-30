@@ -12,7 +12,6 @@ import type { SubmitComplaintResponse } from "@/types/api";
 export function SubmitComplaintForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,7 +34,6 @@ export function SubmitComplaintForm() {
       const res = await submitComplaint({
         submitterName: name.trim(),
         submitterEmail: email.trim(),
-        submitterPhone: phone.trim() ? phone.trim() : undefined,
         category: category.trim(),
         title: title.trim(),
         description: description.trim(),
@@ -56,8 +54,6 @@ export function SubmitComplaintForm() {
                   "name",
                   "submitterEmail",
                   "email",
-                  "submitterPhone",
-                  "phone",
                   "category",
                   "title",
                   "description",
@@ -217,18 +213,6 @@ export function SubmitComplaintForm() {
           hint="We will use this address to verify your identity when tracking."
           disabled={loading}
           placeholder="jane@example.com"
-        />
-
-        <Field
-          id="phone"
-          type="tel"
-          label="Phone Number (Optional)"
-          maxLength={30}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          error={fieldErrors.submitterPhone}
-          disabled={loading}
-          placeholder="+1 555-0199"
         />
 
         <Field
