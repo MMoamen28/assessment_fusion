@@ -1,4 +1,10 @@
-import type { ApiErrorBody, SessionUserDto } from "@/types/api";
+import type {
+  ApiErrorBody,
+  SessionUserDto,
+  SubmitComplaintInput,
+  SubmitComplaintResponse,
+  LookupComplaintResponse,
+} from "@/types/api";
 
 export class ApiClientError extends Error {
   status: number;
@@ -84,5 +90,24 @@ export async function logout(): Promise<{ ok: boolean }> {
 export async function getMe(): Promise<{ user: SessionUserDto }> {
   return api<{ user: SessionUserDto }>("/api/auth/me", {
     method: "GET",
+  });
+}
+
+export async function submitComplaint(
+  input: SubmitComplaintInput,
+): Promise<SubmitComplaintResponse> {
+  return api<SubmitComplaintResponse>("/api/complaints/public", {
+    method: "POST",
+    body: input,
+  });
+}
+
+export async function lookupComplaint(
+  reference: string,
+  email: string,
+): Promise<LookupComplaintResponse> {
+  return api<LookupComplaintResponse>("/api/public/lookup", {
+    method: "POST",
+    body: { reference, email },
   });
 }

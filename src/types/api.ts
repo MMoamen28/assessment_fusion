@@ -115,3 +115,21 @@ export interface ApiErrorBody {
     details?: unknown;
   };
 }
+
+export interface SubmitComplaintInput {
+  submitterName: string;
+  submitterEmail: string;
+  submitterPhone?: string;
+  category: string;
+  title: string;
+  description: string;
+}
+
+export interface SubmitComplaintResponse {
+  reference: string;
+  publicToken: string;
+}
+
+export interface LookupComplaintResponse {
+  publicToken: string;
+}
