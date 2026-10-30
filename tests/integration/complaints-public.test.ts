@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Prisma } from "@prisma/client";
 import { resetDb, createUser, createComplaint as createDbComplaint } from "../helpers/db";
 import { prisma } from "@/lib/db";
 import { createComplaint } from "@/lib/services/complaints";
 import { getPublicComplaint, lookupPublicToken } from "@/lib/services/public";
 import { NotFoundError } from "@/lib/errors";
+import { createComplaintSchema } from "@/lib/validation/complaint";
 
 describe("Public Complaint & Lookup Integration", () => {
   beforeEach(async () => {
@@ -39,6 +41,71 @@ describe("Public Complaint & Lookup Integration", () => {
     expect(activities).toHaveLength(1);
     expect(activities[0].action).toBe("CREATED");
     expect(activities[0].actorId).toBeNull();
+  });
+
+  it("rejects invalid email via createComplaintSchema", () => {
+    const invalidInput = {
+      title: "Broken Streetlight",
+      description: "Streetlight has been flickering for three days continuously",
+      category: "Service",
+      submitterName: "John Citizen",
+      submitterEmail: "not-an-email",
+    };
+    expect(() => createComplaintSchema.parse(invalidInput)).toThrow();
+  });
+
+  it("retries on P2002 collision and succeeds when a subsequent attempt generates unique tokens", async () => {
+    let attempts = 0;
+    const realTransaction = prisma.$transaction.bind(prisma);
+    const txSpy = vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: Parameters<typeof prisma.$transaction>[0]) => {
+      attempts++;
+      if (attempts === 1) {
+        throw new Prisma.PrismaClientKnownRequestError("Unique constraint violation", {
+          code: "P2002",
+          clientVersion: "mock",
+        });
+      }
+      return realTransaction(cb as (tx: Prisma.TransactionClient) => Promise<unknown>);
+    });
+
+    const result = await createComplaint({
+      title: "Retry Streetlight",
+      description: "Streetlight has been flickering for three days continuously",
+      category: "Service",
+      submitterName: "John Citizen",
+      submitterEmail: "retry.citizen@example.com",
+    });
+
+    expect(attempts).toBe(2);
+    expect(result.reference).toBeTruthy();
+    expect(result.publicToken).toBeTruthy();
+
+    txSpy.mockRestore();
+  });
+
+  it("retries up to 5 times on P2002 collision before throwing when retries are exhausted", async () => {
+    let attempts = 0;
+    const txSpy = vi.spyOn(prisma, "$transaction").mockImplementation(async () => {
+      attempts++;
+      throw new Prisma.PrismaClientKnownRequestError("Unique constraint violation", {
+        code: "P2002",
+        clientVersion: "mock",
+      });
+    });
+
+    await expect(
+      createComplaint({
+        title: "Collision Overflow",
+        description: "Streetlight has been flickering for three days continuously",
+        category: "Service",
+        submitterName: "John Citizen",
+        submitterEmail: "overflow.citizen@example.com",
+      }),
+    ).rejects.toThrow();
+
+    expect(attempts).toBe(5);
+
+    txSpy.mockRestore();
   });
 
   it("whitelists public DTO and excludes all submitter, assignee, internal, and actor info", async () => {
