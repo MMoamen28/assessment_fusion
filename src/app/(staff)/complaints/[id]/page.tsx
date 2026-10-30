@@ -47,7 +47,9 @@ function getActivitySentence(
 
   switch (activity.action) {
     case "CREATED":
-      return "Complaint submitted";
+      return meta.channel === "staff"
+        ? "Logged by staff"
+        : "Complaint submitted by the complainant";
     case "CLAIMED":
       return `${actor} claimed this complaint`;
     case "ASSIGNED": {

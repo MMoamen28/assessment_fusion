@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Priority } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateReference, generatePublicToken } from "@/lib/ids";
@@ -44,7 +44,8 @@ export async function createComplaint(
     : (optionsOrInput as CreateComplaintInput);
   const actor = isOptions ? (optionsOrInput as CreateComplaintOptions).actor ?? null : null;
   const channel = isOptions ? (optionsOrInput as CreateComplaintOptions).channel ?? "public" : "public";
-  const priority = "priority" in input && input.priority ? input.priority : "MEDIUM";
+  const priority: Priority =
+    "priority" in input && input.priority ? (input.priority as Priority) : Priority.MEDIUM;
 
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
