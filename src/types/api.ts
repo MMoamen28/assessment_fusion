@@ -132,3 +132,21 @@ export interface SubmitComplaintResponse {
 export interface LookupComplaintResponse {
   publicToken: string;
 }
+
+export interface ActionResult {
+  success: boolean;
+}
+
+export interface AddCommentResponse {
+  id: string;
+  complaintId: string;
+  authorId: string | null;
+  body: string;
+  isInternal: boolean;
+  createdAt: string;
+}
+
+export interface AssignableUser {
+  id: string;
+  name: string;
+}

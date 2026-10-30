@@ -4,6 +4,10 @@ import type {
   SubmitComplaintInput,
   SubmitComplaintResponse,
   LookupComplaintResponse,
+  ActionResult,
+  AddCommentResponse,
+  Status,
+  Priority,
 } from "@/types/api";
 
 export class ApiClientError extends Error {
@@ -109,5 +113,56 @@ export async function lookupComplaint(
   return api<LookupComplaintResponse>("/api/public/lookup", {
     method: "POST",
     body: { reference, email },
+  });
+}
+
+export async function claimComplaint(id: string): Promise<ActionResult> {
+  return api<ActionResult>(`/api/complaints/${id}/claim`, {
+    method: "POST",
+  });
+}
+
+export async function assignComplaint(
+  id: string,
+  assigneeId: string,
+  expectedVersion: number,
+): Promise<ActionResult> {
+  return api<ActionResult>(`/api/complaints/${id}/assign`, {
+    method: "POST",
+    body: { assigneeId, expectedVersion },
+  });
+}
+
+export async function changeComplaintStatus(
+  id: string,
+  status: Status,
+  expectedVersion: number,
+  note?: string,
+): Promise<ActionResult> {
+  return api<ActionResult>(`/api/complaints/${id}/status`, {
+    method: "POST",
+    body: { status, expectedVersion, note: note ? note.trim() : undefined },
+  });
+}
+
+export async function changeComplaintPriority(
+  id: string,
+  priority: Priority,
+  expectedVersion: number,
+): Promise<ActionResult> {
+  return api<ActionResult>(`/api/complaints/${id}/priority`, {
+    method: "POST",
+    body: { priority, expectedVersion },
+  });
+}
+
+export async function addComment(
+  id: string,
+  body: string,
+  isInternal: boolean,
+): Promise<AddCommentResponse> {
+  return api<AddCommentResponse>(`/api/complaints/${id}/comments`, {
+    method: "POST",
+    body: { body, internal: isInternal },
   });
 }
