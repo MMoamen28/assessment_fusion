@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Status, Priority } from "@prisma/client";
 import { NotFoundError } from "@/lib/errors";
+import { COMPLAINT_CATEGORIES } from "@/lib/domain/constants";
 
 const cuidSchema = z.string().cuid();
 
@@ -16,7 +17,7 @@ export function validateComplaintId(id: string): string {
 export const createComplaintSchema = z.object({
   submitterName: z.string().trim().min(1).max(100),
   submitterEmail: z.string().trim().email().toLowerCase().max(255),
-  category: z.string().trim().min(1).max(100),
+  category: z.enum(COMPLAINT_CATEGORIES),
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().min(10).max(5000),
 });

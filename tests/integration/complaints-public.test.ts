@@ -14,7 +14,7 @@ describe("Public Complaint & Lookup Integration", () => {
     const result = await createComplaint({
       title: "Broken Streetlight",
       description: "Streetlight has been flickering for three days continuously",
-      category: "Infrastructure",
+      category: "Service",
       submitterName: "John Citizen",
       submitterEmail: "john.citizen@example.com",
     });
