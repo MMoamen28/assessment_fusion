@@ -258,6 +258,4 @@ npm run lint
 
 ---
 
-## License
 
-MIT License. Designed and maintained for modern civic services and complaint management.
