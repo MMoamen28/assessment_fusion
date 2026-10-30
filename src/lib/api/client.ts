@@ -8,6 +8,7 @@ import type {
   AddCommentResponse,
   Status,
   Priority,
+  PublicComment,
 } from "@/types/api";
 
 export class ApiClientError extends Error {
@@ -164,5 +165,15 @@ export async function addComment(
   return api<AddCommentResponse>(`/api/complaints/${id}/comments`, {
     method: "POST",
     body: { body, internal: isInternal },
+  });
+}
+
+export async function replyToComplaint(
+  token: string,
+  body: string,
+): Promise<PublicComment> {
+  return api<PublicComment>(`/api/public/complaints/${token}/comments`, {
+    method: "POST",
+    body: { body },
   });
 }

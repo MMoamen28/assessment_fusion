@@ -6,6 +6,7 @@ import { NotFoundError } from "@/lib/errors";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { ReplyForm } from "@/components/ReplyForm";
 import { formatDateTime } from "@/lib/format";
 import type { Status } from "@/types/api";
 
@@ -134,6 +135,12 @@ export default async function TrackTokenPage({ params }: TrackTokenPageProps) {
           </div>
         ) : (
           <div className="empty-state">No updates yet</div>
+        )}
+
+        {complaint.status !== "CLOSED" && complaint.status !== "REJECTED" && (
+          <div style={{ marginTop: "1.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+            <ReplyForm publicToken={token} />
+          </div>
         )}
       </div>
     </div>

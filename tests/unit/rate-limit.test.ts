@@ -3,7 +3,7 @@ import { createRateLimiter } from "@/lib/rate-limit";
 
 describe("Rate Limiter Unit Tests", () => {
   it("allows up to the limit and blocks the next request", () => {
-    let currentTime = 1000;
+    const currentTime = 1000;
     const limiter = createRateLimiter({
       limit: 3,
       windowMs: 60000,
@@ -38,7 +38,7 @@ describe("Rate Limiter Unit Tests", () => {
   });
 
   it("keeps different keys independent", () => {
-    let currentTime = 1000;
+    const currentTime = 1000;
     const limiter = createRateLimiter({
       limit: 1,
       windowMs: 60000,
@@ -76,7 +76,7 @@ describe("Rate Limiter Unit Tests", () => {
   });
 
   it("resets store immediately on reset()", () => {
-    let currentTime = 1000;
+    const currentTime = 1000;
     const limiter = createRateLimiter({
       limit: 1,
       windowMs: 60000,
