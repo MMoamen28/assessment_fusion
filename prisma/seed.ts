@@ -12,18 +12,23 @@ function hoursAfter(date: Date, hours: number): Date {
   return new Date(date.getTime() + hours * 60 * 60 * 1000);
 }
 
-async function main() {
+export async function runSeed(
+  prismaClient: PrismaClient = prisma,
+  options: { clean?: boolean } = { clean: true }
+) {
   console.log("Seeding database...");
 
-  await prisma.activity.deleteMany();
-  await prisma.comment.deleteMany();
-  await prisma.complaint.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany();
+  if (options.clean) {
+    await prismaClient.activity.deleteMany();
+    await prismaClient.comment.deleteMany();
+    await prismaClient.complaint.deleteMany();
+    await prismaClient.session.deleteMany();
+    await prismaClient.user.deleteMany();
+  }
 
   const passwordHash = await hash("Password123!", 10);
 
-  const admin = await prisma.user.create({
+  const admin = await prismaClient.user.create({
     data: {
       email: "admin@example.com",
       name: "Alex Admin",
@@ -32,7 +37,7 @@ async function main() {
     },
   });
 
-  const agent1 = await prisma.user.create({
+  const agent1 = await prismaClient.user.create({
     data: {
       email: "agent1@example.com",
       name: "Sam Agent",
@@ -41,7 +46,7 @@ async function main() {
     },
   });
 
-  const agent2 = await prisma.user.create({
+  const agent2 = await prismaClient.user.create({
     data: {
       email: "agent2@example.com",
       name: "Riley Agent",
@@ -169,7 +174,7 @@ async function main() {
     const reference = generateReference();
     const publicToken = generatePublicToken();
 
-    const complaint = await prisma.complaint.create({
+    const complaint = await prismaClient.complaint.create({
       data: {
         reference,
         publicToken,
@@ -186,7 +191,7 @@ async function main() {
       },
     });
 
-    await prisma.activity.create({
+    await prismaClient.activity.create({
       data: {
         complaintId: complaint.id,
         action: ActivityAction.CREATED,
@@ -202,7 +207,7 @@ async function main() {
 
     if (item.assigneeId) {
       const assignedAt = hoursAfter(item.createdAt, 2);
-      await prisma.activity.create({
+      await prismaClient.activity.create({
         data: {
           complaintId: complaint.id,
           action: ActivityAction.ASSIGNED,
@@ -215,7 +220,7 @@ async function main() {
       });
 
       if (item.status === Status.IN_REVIEW) {
-        await prisma.comment.create({
+        await prismaClient.comment.create({
           data: {
             complaintId: complaint.id,
             authorId: item.assigneeId,
@@ -226,7 +231,7 @@ async function main() {
         });
       } else if (item.status === Status.RESOLVED) {
         const resolvedAt = hoursAfter(assignedAt, 3);
-        await prisma.activity.create({
+        await prismaClient.activity.create({
           data: {
             complaintId: complaint.id,
             action: ActivityAction.STATUS_CHANGED,
@@ -238,7 +243,7 @@ async function main() {
             createdAt: resolvedAt,
           },
         });
-        await prisma.comment.create({
+        await prismaClient.comment.create({
           data: {
             complaintId: complaint.id,
             authorId: item.assigneeId,
@@ -249,7 +254,7 @@ async function main() {
         });
       } else if (item.status === Status.CLOSED) {
         const closedAt = hoursAfter(assignedAt, 6);
-        await prisma.activity.create({
+        await prismaClient.activity.create({
           data: {
             complaintId: complaint.id,
             action: ActivityAction.STATUS_CHANGED,
@@ -263,7 +268,7 @@ async function main() {
         });
       } else if (item.status === Status.REJECTED) {
         const rejectedAt = hoursAfter(assignedAt, 2);
-        await prisma.activity.create({
+        await prismaClient.activity.create({
           data: {
             complaintId: complaint.id,
             action: ActivityAction.STATUS_CHANGED,
@@ -276,7 +281,7 @@ async function main() {
             createdAt: rejectedAt,
           },
         });
-        await prisma.comment.create({
+        await prismaClient.comment.create({
           data: {
             complaintId: complaint.id,
             authorId: item.assigneeId,
@@ -292,11 +297,13 @@ async function main() {
   console.log("Seeding completed successfully with 10 complaints.");
 }
 
-main()
-  .catch((e) => {
-    console.error("Error during seeding:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (process.argv[1] && /seed\.(ts|js|mjs)$/.test(process.argv[1])) {
+  runSeed(prisma, { clean: true })
+    .catch((e) => {
+      console.error("Error during seeding:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
