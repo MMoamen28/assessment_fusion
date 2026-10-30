@@ -125,12 +125,14 @@ The platform enforces strict role-based access control (RBAC) across three disti
 
 ### Default Credentials (Clean-Sheet Start)
 
-After seeding or starting the fresh project, one default administrator is created:
-- **Email:** `admin@example.com`
-- **Password:** `Password123!`
-- **Role:** `ADMIN`
+After seeding or starting the fresh project, the default staff accounts are provisioned:
 
-Citizens can register accounts anytime via **`/register`**; all self-registered accounts are automatically and immutably assigned the **`CUSTOMER`** role on the server.
+| Role | Name | Email | Password | Access Path |
+| :--- | :--- | :--- | :--- | :--- |
+| **`ADMIN`** | Alex Admin | `admin@example.com` | `Password123!` | `/dashboard` (Full admin rights & assignment) |
+| **`AGENT`** | Sam Agent | `agent1@example.com` | `Password123!` | `/dashboard` (Ticket claiming & resolution) |
+
+Citizens can register accounts anytime via **`/register`**; all self-registered accounts are automatically and immutably assigned the **`CUSTOMER`** role on the server and access their portal at **`/my-complaints`**.
 
 ---
 

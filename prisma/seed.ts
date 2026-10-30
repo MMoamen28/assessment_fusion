@@ -28,8 +28,17 @@ export async function runSeed(
     },
   });
 
-  console.log(`Created 1 admin user: ${admin.email}`);
-  console.log("Clean sheet ready: 1 admin user, 0 agents, 0 complaints.");
+  const agent = await prismaClient.user.create({
+    data: {
+      email: "agent1@example.com",
+      name: "Sam Agent",
+      role: Role.AGENT,
+      passwordHash,
+    },
+  });
+
+  console.log(`Created staff users: ${admin.email} (ADMIN), ${agent.email} (AGENT)`);
+  console.log("Ready: 1 admin user, 1 agent user, 0 complaints.");
 }
 
 if (process.argv[1] && /seed\.(ts|js|mjs)$/.test(process.argv[1])) {
