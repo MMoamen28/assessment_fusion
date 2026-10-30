@@ -8,37 +8,42 @@ export default function HomePage() {
           Complaints Management Portal
         </h1>
         <p style={{ color: "var(--text-muted)", fontSize: "1.0625rem" }}>
-          Submit public service complaints, track status with your reference number, or sign in to manage tickets.
+          Verified citizen complaint submission, centralized status tracking, and municipal resolution management.
         </p>
       </div>
 
       <div className="card-grid">
         <div className="card">
-          <h2 className="card-title">Submit a Complaint</h2>
+          <h2 className="card-title">Citizen Portal &amp; Tracking</h2>
           <p className="card-desc">
-            File a new issue regarding billing, products, delivery, or public services.
+            Log in to submit new complaints, track all your existing cases in real-time, and receive municipal responses.
           </p>
-          <Link href="/submit" className="btn btn-primary">
-            Submit complaint &rarr;
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "auto" }}>
+            <Link href="/submit" className="btn btn-primary">
+              Submit complaint &rarr;
+            </Link>
+            <Link href="/my-complaints" className="btn btn-secondary">
+              My complaints
+            </Link>
+          </div>
+        </div>
+
+        <div className="card">
+          <h2 className="card-title">Register Citizen Account</h2>
+          <p className="card-desc">
+            Create your citizen account in seconds to keep all your service requests and complaint history in one place.
+          </p>
+          <Link href="/register" className="btn btn-secondary" style={{ marginTop: "auto" }}>
+            Create account &rarr;
           </Link>
         </div>
 
         <div className="card">
-          <h2 className="card-title">Track a Complaint</h2>
+          <h2 className="card-title">Staff Management Portal</h2>
           <p className="card-desc">
-            Check the live progress, status updates, and public notes on an existing ticket.
+            Authorized municipal agents and administrators sign in to review, claim, assign, and resolve citizen tickets.
           </p>
-          <Link href="/track" className="btn btn-secondary">
-            Track status &rarr;
-          </Link>
-        </div>
-
-        <div className="card">
-          <h2 className="card-title">Staff Portal</h2>
-          <p className="card-desc">
-            Staff agents and administrators sign in to review, claim, assign, and resolve tickets.
-          </p>
-          <Link href="/login" className="btn btn-secondary">
+          <Link href="/login" className="btn btn-secondary" style={{ marginTop: "auto" }}>
             Staff sign in &rarr;
           </Link>
         </div>

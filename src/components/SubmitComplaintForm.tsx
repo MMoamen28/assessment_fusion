@@ -14,9 +14,11 @@ import type { SubmitComplaintResponse } from "@/types/api";
 export function SubmitComplaintForm({
   initialName = "",
   initialEmail = "",
+  isLoggedIn = false,
 }: {
   initialName?: string;
   initialEmail?: string;
+  isLoggedIn?: boolean;
 } = {}) {
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
@@ -167,21 +169,48 @@ export function SubmitComplaintForm({
           )}
         </div>
 
-        <Alert type="warning">
-          Save this link and reference. You will need them to check your complaint later.
-        </Alert>
+        {isLoggedIn ? (
+          <Alert type="success">
+            This complaint is securely linked to your citizen account (<strong>{email}</strong>). You can track live progress anytime from your personal dashboard.
+          </Alert>
+        ) : (
+          <Alert type="warning">
+            Save this link and reference. You will need them to check your complaint later.
+          </Alert>
+        )}
 
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem" }}>
-          <Link
-            href={trackingPath}
-            className="btn btn-primary"
-            style={{ flex: 1, textAlign: "center" }}
-          >
-            View complaint status &rarr;
-          </Link>
-          <Link href="/" className="btn btn-secondary">
-            Return home
-          </Link>
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.5rem", flexWrap: "wrap" }}>
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/my-complaints"
+                className="btn btn-primary"
+                style={{ flex: 1, minWidth: "200px", textAlign: "center" }}
+              >
+                Go to My Complaints &rarr;
+              </Link>
+              <Link
+                href={trackingPath}
+                className="btn btn-secondary"
+                style={{ flex: 1, minWidth: "160px", textAlign: "center" }}
+              >
+                View ticket &amp; reply
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href={trackingPath}
+                className="btn btn-primary"
+                style={{ flex: 1, textAlign: "center" }}
+              >
+                View complaint status &rarr;
+              </Link>
+              <Link href="/" className="btn btn-secondary">
+                Return home
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );
@@ -205,7 +234,7 @@ export function SubmitComplaintForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={fieldErrors.submitterName}
-          disabled={loading}
+          disabled={loading || Boolean(initialName && isLoggedIn)}
           placeholder="Jane Doe"
         />
 
@@ -218,8 +247,8 @@ export function SubmitComplaintForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           error={fieldErrors.submitterEmail}
-          hint="We will use this address to verify your identity when tracking."
-          disabled={loading}
+          hint={isLoggedIn ? "Linked directly to your verified citizen account" : "Official status updates will be sent to this email"}
+          disabled={loading || Boolean(initialEmail && isLoggedIn)}
           placeholder="jane@example.com"
         />
 

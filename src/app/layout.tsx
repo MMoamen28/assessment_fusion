@@ -10,33 +10,54 @@ export const metadata: Metadata = {
   description: "Citizen complaint submission, tracking, and management portal",
 };
 
-async function UserNav() {
+async function HeaderNav() {
   const user = await getCurrentUser();
 
   if (!user) {
     return (
-      <>
+      <nav className="site-nav">
+        <Link href="/submit" className="nav-link">
+          Submit a complaint
+        </Link>
         <Link href="/register" className="nav-link">
           Register
         </Link>
         <Link href="/login" className="nav-link">
           Sign in
         </Link>
-      </>
+      </nav>
     );
   }
 
-  return (
-    <>
-      {user.role === "CUSTOMER" ? (
+  if (user.role === "CUSTOMER") {
+    return (
+      <nav className="site-nav">
+        <Link href="/submit" className="nav-link">
+          Submit a complaint
+        </Link>
         <Link href="/my-complaints" className="nav-link">
           My complaints
         </Link>
-      ) : (
-        <Link href="/dashboard" className="nav-link">
-          Dashboard
-        </Link>
-      )}
+        <div className="nav-user">
+          <span className="user-badge">
+            <span className="user-name">{user.name}</span>
+            <span className="user-role">{user.role}</span>
+          </span>
+          <LogoutButton />
+        </div>
+      </nav>
+    );
+  }
+
+  // Staff (ADMIN / AGENT)
+  return (
+    <nav className="site-nav">
+      <Link href="/dashboard" className="nav-link">
+        Dashboard
+      </Link>
+      <Link href="/complaints/new" className="nav-link">
+        New complaint
+      </Link>
       <div className="nav-user">
         <span className="user-badge">
           <span className="user-name">{user.name}</span>
@@ -44,7 +65,7 @@ async function UserNav() {
         </span>
         <LogoutButton />
       </div>
-    </>
+    </nav>
   );
 }
 
@@ -61,23 +82,17 @@ export default function RootLayout({
             <Link href="/" className="site-brand">
               Complaints Portal
             </Link>
-            <nav className="site-nav">
-              <Link href="/submit" className="nav-link">
-                Submit a complaint
-              </Link>
-              <Link href="/track" className="nav-link">
-                Track a complaint
-              </Link>
-              <Suspense
-                fallback={
+            <Suspense
+              fallback={
+                <nav className="site-nav">
                   <Link href="/login" className="nav-link">
-                    Staff login
+                    Sign in
                   </Link>
-                }
-              >
-                <UserNav />
-              </Suspense>
-            </nav>
+                </nav>
+              }
+            >
+              <HeaderNav />
+            </Suspense>
           </div>
         </header>
         <main className="main-content">

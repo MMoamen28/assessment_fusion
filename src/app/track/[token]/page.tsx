@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPublicComplaint } from "@/lib/services/public";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { NotFoundError } from "@/lib/errors";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
@@ -26,6 +27,7 @@ interface TrackTokenPageProps {
 
 export default async function TrackTokenPage({ params }: TrackTokenPageProps) {
   const { token } = await params;
+  const user = await getCurrentUser();
 
   let complaint;
   try {
@@ -37,11 +39,14 @@ export default async function TrackTokenPage({ params }: TrackTokenPageProps) {
     throw err;
   }
 
+  const backHref = user?.role === "CUSTOMER" ? "/my-complaints" : user ? "/dashboard" : "/";
+  const backLabel = user?.role === "CUSTOMER" ? "Back to my complaints" : user ? "Back to dashboard" : "Back to home";
+
   return (
     <div style={{ maxWidth: "760px", margin: "0 auto" }}>
       <div style={{ marginBottom: "1rem" }}>
-        <Link href="/track" style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
-          &larr; Back to lookup
+        <Link href={backHref} style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>
+          &larr; {backLabel}
         </Link>
       </div>
 
