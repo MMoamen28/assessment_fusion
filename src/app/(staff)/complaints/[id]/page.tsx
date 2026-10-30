@@ -51,35 +51,16 @@ function getActivitySentence(
     case "CLAIMED":
       return `${actor} claimed this complaint`;
     case "ASSIGNED": {
-      const toId =
-        typeof meta.to === "string"
-          ? meta.to
-          : typeof meta.assignedTo === "string"
-          ? meta.assignedTo
-          : "";
+      const toId = typeof meta.to === "string" ? meta.to : "";
       const toName = (toId && userMap.get(toId)) || toId || "someone";
       return `${actor} assigned it to ${toName}`;
     }
     case "STATUS_CHANGED": {
-      const from =
-        typeof meta.from === "string"
-          ? meta.from
-          : typeof meta.previousStatus === "string"
-          ? meta.previousStatus
-          : "?";
-      const to =
-        typeof meta.to === "string"
-          ? meta.to
-          : typeof meta.newStatus === "string"
-          ? meta.newStatus
-          : "?";
+      const from = typeof meta.from === "string" ? meta.from : "?";
+      const to = typeof meta.to === "string" ? meta.to : "?";
       const note =
-        typeof meta.note === "string" && meta.note.trim()
-          ? meta.note.trim()
-          : typeof meta.reason === "string" && meta.reason.trim()
-          ? meta.reason.trim()
-          : "";
-      return `${actor} changed status from ${from} to ${to}${note ? `: ${note}` : ""}`;
+        typeof meta.note === "string" && meta.note.trim() ? `: ${meta.note.trim()}` : "";
+      return `${actor} changed status from ${from} to ${to}${note}`;
     }
     case "PRIORITY_CHANGED": {
       const from = typeof meta.from === "string" ? meta.from : "?";
@@ -87,6 +68,9 @@ function getActivitySentence(
       return `${actor} changed priority from ${from} to ${to}`;
     }
     case "COMMENTED": {
+      if (!activity.actor && meta.by === "complainant") {
+        return "The complainant added a reply";
+      }
       if (meta.internal === true) {
         return `${actor} added an internal comment`;
       }

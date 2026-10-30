@@ -144,7 +144,7 @@ export function toPublicComplaintDto(row: RawPublicQueryResult): PublicComplaint
   const comments: PublicCommentDto[] = row.comments.map((c) => ({
     body: c.body,
     createdAt: c.createdAt,
-    authorRole: c.author?.role ? "Support team" : "Support team",
+    authorRole: c.author ? "Support team" : "Complainant",
   }));
 
   const timeline: PublicTimelineItemDto[] = row.activities.map((a) => {

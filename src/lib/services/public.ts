@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/db";
-import { NotFoundError } from "@/lib/errors";
+import { NotFoundError, ConflictError } from "@/lib/errors";
+import { addCommentSchema } from "@/lib/validation/complaint";
 import {
   publicComplaintSelect,
   toPublicComplaintDto,
   type PublicComplaintDto,
+  type PublicCommentDto,
 } from "./dto";
 
 export async function getPublicComplaint(publicToken: string): Promise<PublicComplaintDto> {
@@ -38,4 +40,54 @@ export async function lookupPublicToken(
   }
 
   return { publicToken: complaint.publicToken };
+}
+
+export async function addComplainantComment(
+  publicToken: string,
+  body: string,
+): Promise<PublicCommentDto> {
+  const trimmedBody = addCommentSchema.shape.body.parse(body);
+
+  return prisma.$transaction(async (tx) => {
+    const complaint = await tx.complaint.findUnique({
+      where: { publicToken },
+      select: { id: true, status: true },
+    });
+
+    if (!complaint) {
+      throw new NotFoundError("Complaint not found");
+    }
+
+    if (complaint.status === "CLOSED" || complaint.status === "REJECTED") {
+      throw new ConflictError("This complaint is closed and no longer accepts replies");
+    }
+
+    const comment = await tx.comment.create({
+      data: {
+        complaintId: complaint.id,
+        authorId: null,
+        isInternal: false,
+        body: trimmedBody,
+      },
+      select: {
+        body: true,
+        createdAt: true,
+      },
+    });
+
+    await tx.activity.create({
+      data: {
+        complaintId: complaint.id,
+        actorId: null,
+        action: "COMMENTED",
+        metadata: { internal: false, by: "complainant" },
+      },
+    });
+
+    return {
+      body: comment.body,
+      createdAt: comment.createdAt,
+      authorRole: "Complainant",
+    };
+  });
 }
