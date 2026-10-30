@@ -13,6 +13,7 @@ import {
 } from "@/lib/errors";
 import type {
   CreateComplaintInput,
+  CreateStaffComplaintInput,
   ChangeStatusInput,
   ChangePriorityInput,
   ListQueryInput,
@@ -26,7 +27,25 @@ import {
 } from "./dto";
 
 
-export async function createComplaint(input: CreateComplaintInput) {
+export interface CreateComplaintOptions {
+  input: CreateComplaintInput | CreateStaffComplaintInput;
+  actor?: SessionUser | null;
+  channel?: "public" | "staff";
+}
+
+export async function createComplaint(
+  optionsOrInput: CreateComplaintOptions | CreateComplaintInput,
+) {
+  const isOptions =
+    "input" in optionsOrInput &&
+    ("channel" in optionsOrInput || "actor" in optionsOrInput || !("title" in optionsOrInput));
+  const input = isOptions
+    ? (optionsOrInput as CreateComplaintOptions).input
+    : (optionsOrInput as CreateComplaintInput);
+  const actor = isOptions ? (optionsOrInput as CreateComplaintOptions).actor ?? null : null;
+  const channel = isOptions ? (optionsOrInput as CreateComplaintOptions).channel ?? "public" : "public";
+  const priority = "priority" in input && input.priority ? input.priority : "MEDIUM";
+
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       const reference = generateReference();
@@ -43,7 +62,7 @@ export async function createComplaint(input: CreateComplaintInput) {
             submitterName: input.submitterName,
             submitterEmail: input.submitterEmail,
             status: "OPEN",
-            priority: "MEDIUM",
+            priority,
             assigneeId: null,
             version: 0,
           },
@@ -52,12 +71,13 @@ export async function createComplaint(input: CreateComplaintInput) {
         await tx.activity.create({
           data: {
             complaintId: complaint.id,
-            actorId: null,
+            actorId: actor?.id ?? null,
             action: "CREATED",
+            metadata: { channel },
           },
         });
 
-        return { reference, publicToken };
+        return { id: complaint.id, reference, publicToken };
       });
     } catch (err) {
       if (

@@ -24,6 +24,12 @@ export const createComplaintSchema = z.object({
 
 export type CreateComplaintInput = z.infer<typeof createComplaintSchema>;
 
+export const createStaffComplaintSchema = createComplaintSchema.extend({
+  priority: z.nativeEnum(Priority).optional().default(Priority.MEDIUM),
+});
+
+export type CreateStaffComplaintInput = z.infer<typeof createStaffComplaintSchema>;
+
 export const assignSchema = z.object({
   assigneeId: z.string().trim().min(1),
   expectedVersion: z.number().int().min(0),
