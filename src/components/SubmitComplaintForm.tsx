@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { submitComplaint, ApiClientError } from "@/lib/api/client";
 import { Field } from "@/components/ui/Field";
+import { SelectField } from "@/components/ui/SelectField";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
+import { COMPLAINT_CATEGORIES } from "@/lib/domain/constants";
 import type { SubmitComplaintResponse } from "@/types/api";
 
 export function SubmitComplaintForm() {
@@ -215,17 +217,16 @@ export function SubmitComplaintForm() {
           placeholder="jane@example.com"
         />
 
-        <Field
+        <SelectField
           id="category"
           label="Category"
           required
-          maxLength={100}
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           error={fieldErrors.category}
-          hint="e.g. Billing, Service, Delivery, Product, Facilities"
           disabled={loading}
-          placeholder="Service"
+          placeholderOption="Select a category..."
+          options={COMPLAINT_CATEGORIES}
         />
 
         <Field
