@@ -7,7 +7,7 @@ export async function setSessionCookie(token: string, expiresAt: Date): Promise<
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    secure: env.NODE_ENV === "production",
+    secure: env.COOKIE_SECURE,
     expires: expiresAt,
   });
 }
@@ -18,7 +18,7 @@ export async function clearSessionCookie(): Promise<void> {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    secure: env.NODE_ENV === "production",
+    secure: env.COOKIE_SECURE,
     maxAge: 0,
   });
 }
