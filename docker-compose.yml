@@ -12,6 +12,27 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d complaints_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://app:app@db:5432/complaints_dev"
+      NODE_ENV: "production"
+      COOKIE_SECURE: "false"
+      SESSION_COOKIE_NAME: "session"
+      SESSION_TTL_HOURS: "12"
+      SEED_ON_START: "true"
 
 volumes:
   pgdata:
