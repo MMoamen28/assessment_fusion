@@ -17,5 +17,3 @@ export const POST = handle<RouteContext>(async (req, ctx) => {
   const result = await changeStatus(actor, validatedId, body);
   return NextResponse.json(result);
 });
-
-export const PATCH = POST;
