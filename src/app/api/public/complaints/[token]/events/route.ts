@@ -3,8 +3,6 @@ import { eventBus, ListenerLimitError } from "@/lib/realtime/bus";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/api/client-ip";
 
-export const dynamic = "force-dynamic";
-
 export const publicStreamLimiter = createRateLimiter({ limit: 30, windowMs: 15 * 60 * 1000 });
 
 interface RouteContext {
@@ -128,3 +126,4 @@ export async function GET(req: Request, ctx: RouteContext) {
     },
   });
 }
+

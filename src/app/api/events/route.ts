@@ -1,8 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { eventBus, ListenerLimitError } from "@/lib/realtime/bus";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
   const actor = await getCurrentUser();
   if (!actor) {
@@ -101,3 +99,4 @@ export async function GET(req: Request) {
     },
   });
 }
+
