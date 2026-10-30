@@ -75,7 +75,6 @@ export function TrackLookupForm() {
         onChange={(e) => setEmail(e.target.value)}
         error={fieldErrors.email}
         hint="The email address you entered when submitting the complaint"
-        placeholder="jane@example.com"
         disabled={loading}
       />
 

@@ -87,7 +87,6 @@ export function NewComplaintForm() {
           label="Complainant Name"
           name="submitterName"
           required
-          placeholder="e.g. Jane Doe"
           value={submitterName}
           onChange={(e) => setSubmitterName(e.target.value)}
           error={fieldErrors.submitterName}
@@ -99,7 +98,6 @@ export function NewComplaintForm() {
           name="submitterEmail"
           type="email"
           required
-          placeholder="e.g. jane.doe@example.com"
           value={submitterEmail}
           onChange={(e) => setSubmitterEmail(e.target.value)}
           error={fieldErrors.submitterEmail}

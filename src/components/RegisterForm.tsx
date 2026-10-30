@@ -75,7 +75,6 @@ export function RegisterForm() {
         value={name}
         onChange={(e) => setName(e.target.value)}
         disabled={loading}
-        placeholder="Jane Doe"
       />
 
       <Field
@@ -87,7 +86,6 @@ export function RegisterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={loading}
-        placeholder="citizen@example.com"
       />
 
       <Field

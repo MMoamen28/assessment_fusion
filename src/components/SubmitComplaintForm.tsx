@@ -234,8 +234,7 @@ export function SubmitComplaintForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={fieldErrors.submitterName}
-          disabled={loading || Boolean(initialName && isLoggedIn)}
-          placeholder="Jane Doe"
+          disabled={loading}
         />
 
         <Field
@@ -249,7 +248,6 @@ export function SubmitComplaintForm({
           error={fieldErrors.submitterEmail}
           hint={isLoggedIn ? "Linked directly to your verified citizen account" : "Official status updates will be sent to this email"}
           disabled={loading || Boolean(initialEmail && isLoggedIn)}
-          placeholder="jane@example.com"
         />
 
         <SelectField
