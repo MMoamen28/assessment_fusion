@@ -20,7 +20,7 @@ describe("Complaints Priority Integration", () => {
       title: "Priority Test Ticket",
       assigneeId: agent.id,
       priority: "MEDIUM",
-      status: "OPEN",
+      status: "IN_REVIEW",
       version: 0,
     });
 
@@ -154,7 +154,7 @@ describe("Complaints Priority Integration", () => {
     const complaint = await createComplaint({
       assigneeId: agent.id,
       priority: "LOW",
-      status: "OPEN",
+      status: "IN_REVIEW",
       version: 2,
     });
 
@@ -175,7 +175,7 @@ describe("Complaints Priority Integration", () => {
     const complaint = await createComplaint({
       assigneeId: agent.id,
       priority: "MEDIUM",
-      status: "OPEN",
+      status: "IN_REVIEW",
       version: 0,
     });
 

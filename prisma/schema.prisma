@@ -81,6 +81,10 @@ model Complaint {
   @@index([assigneeId])
   @@index([createdAt])
   @@index([priority])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "complaint_title_trgm_idx")
+  @@index([reference(ops: raw("gin_trgm_ops"))], type: Gin, map: "complaint_reference_trgm_idx")
+  @@index([submitterName(ops: raw("gin_trgm_ops"))], type: Gin, map: "complaint_submitter_name_trgm_idx")
+  @@index([submitterEmail(ops: raw("gin_trgm_ops"))], type: Gin, map: "complaint_submitter_email_trgm_idx")
 }
 
 model Comment {

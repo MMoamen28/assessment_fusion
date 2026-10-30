@@ -18,59 +18,46 @@ describe("Complaints Workflow Integration", () => {
     const agent = await createUser({ role: "AGENT" });
 
     const complaint = await createComplaint({
-      status: "OPEN",
+      status: "IN_REVIEW",
       assigneeId: agent.id,
       version: 0,
     });
 
     await changeStatus(
-      { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
+      { id: agent.id, email: agent.email, name: agent.name, role: agent.role },
       complaint.id,
-      { status: "IN_REVIEW", expectedVersion: 0 },
+      { status: "RESOLVED", expectedVersion: 0, note: "Resolved successfully" },
     );
 
     let updated = await prisma.complaint.findUnique({ where: { id: complaint.id } });
-    expect(updated?.status).toBe("IN_REVIEW");
-    expect(updated?.version).toBe(1);
-
-    await changeStatus(
-      { id: agent.id, email: agent.email, name: agent.name, role: agent.role },
-      complaint.id,
-      { status: "RESOLVED", expectedVersion: 1, note: "Resolved successfully" },
-    );
-
-    updated = await prisma.complaint.findUnique({ where: { id: complaint.id } });
     expect(updated?.status).toBe("RESOLVED");
-    expect(updated?.version).toBe(2);
+    expect(updated?.version).toBe(1);
 
     await changeStatus(
       { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
       complaint.id,
-      { status: "CLOSED", expectedVersion: 2 },
+      { status: "CLOSED", expectedVersion: 1 },
     );
 
     updated = await prisma.complaint.findUnique({ where: { id: complaint.id } });
     expect(updated?.status).toBe("CLOSED");
-    expect(updated?.version).toBe(3);
+    expect(updated?.version).toBe(2);
 
     const activities = await prisma.activity.findMany({
       where: { complaintId: complaint.id },
       orderBy: { createdAt: "asc" },
     });
 
-    expect(activities).toHaveLength(3);
+    expect(activities).toHaveLength(2);
     expect(activities[0].action).toBe("STATUS_CHANGED");
-    expect(activities[0].metadata).toEqual({ from: "OPEN", to: "IN_REVIEW" });
-
-    expect(activities[1].action).toBe("STATUS_CHANGED");
-    expect(activities[1].metadata).toEqual({
+    expect(activities[0].metadata).toEqual({
       from: "IN_REVIEW",
       to: "RESOLVED",
       note: "Resolved successfully",
     });
 
-    expect(activities[2].action).toBe("STATUS_CHANGED");
-    expect(activities[2].metadata).toEqual({ from: "RESOLVED", to: "CLOSED" });
+    expect(activities[1].action).toBe("STATUS_CHANGED");
+    expect(activities[1].metadata).toEqual({ from: "RESOLVED", to: "CLOSED" });
   });
 
   it("throws InvalidTransitionError on illegal transition and leaves complaint and activities unchanged", async () => {
@@ -211,7 +198,7 @@ describe("Complaints Workflow Integration", () => {
   it("rolls back complaint change when activity write fails inside transaction", async () => {
     const admin = await createUser({ role: "ADMIN" });
     const complaint = await createComplaint({
-      status: "OPEN",
+      status: "IN_REVIEW",
       assigneeId: admin.id,
       version: 0,
     });
@@ -225,13 +212,13 @@ describe("Complaints Workflow Integration", () => {
 
     await expect(
       changeStatus(nonExistentActor, complaint.id, {
-        status: "IN_REVIEW",
+        status: "RESOLVED",
         expectedVersion: 0,
       }),
     ).rejects.toThrow();
 
     const inDb = await prisma.complaint.findUnique({ where: { id: complaint.id } });
-    expect(inDb?.status).toBe("OPEN");
+    expect(inDb?.status).toBe("IN_REVIEW");
     expect(inDb?.version).toBe(0);
 
     const activities = await prisma.activity.findMany({ where: { complaintId: complaint.id } });

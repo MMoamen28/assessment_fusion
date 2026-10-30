@@ -42,6 +42,18 @@ export async function createComplaint(overrides?: Partial<{
   assigneeId: string | null;
   version: number;
 }>): Promise<Complaint> {
+  const status = overrides?.status ?? Status.OPEN;
+  let assigneeId = overrides?.assigneeId;
+
+  if (assigneeId === undefined) {
+    if (status === "IN_REVIEW" || status === "RESOLVED" || status === "CLOSED") {
+      const defaultAgent = await createUser({ role: Role.AGENT });
+      assigneeId = defaultAgent.id;
+    } else {
+      assigneeId = null;
+    }
+  }
+
   return prisma.complaint.create({
     data: {
       reference: generateReference(),
@@ -50,10 +62,10 @@ export async function createComplaint(overrides?: Partial<{
       description: overrides?.description ?? "Test complaint description",
       category: overrides?.category ?? "Service",
       priority: overrides?.priority ?? Priority.MEDIUM,
-      status: overrides?.status ?? Status.OPEN,
+      status,
       submitterName: overrides?.submitterName ?? "Test Submitter",
       submitterEmail: overrides?.submitterEmail ?? "submitter@example.com",
-      assigneeId: overrides?.assigneeId ?? null,
+      assigneeId,
       version: overrides?.version ?? 0,
     },
   });

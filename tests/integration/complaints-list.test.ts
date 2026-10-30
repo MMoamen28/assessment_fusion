@@ -54,28 +54,28 @@ describe("Complaints List & Filtering Integration", () => {
     const cOpen = await createComplaint({
       status: "OPEN",
       priority: "LOW",
-      category: "Roads",
+      category: "Billing",
       assigneeId: null,
     });
 
     const cReviewMe = await createComplaint({
       status: "IN_REVIEW",
       priority: "HIGH",
-      category: "Roads",
+      category: "Billing",
       assigneeId: agent.id,
     });
 
     const cReviewOther = await createComplaint({
       status: "IN_REVIEW",
       priority: "MEDIUM",
-      category: "Parks",
+      category: "Delivery",
       assigneeId: other.id,
     });
 
     const cResolved = await createComplaint({
       status: "RESOLVED",
       priority: "HIGH",
-      category: "Roads",
+      category: "Billing",
       assigneeId: agent.id,
     });
 
@@ -122,7 +122,7 @@ describe("Complaints List & Filtering Integration", () => {
       {
         status: ["IN_REVIEW"],
         priority: ["HIGH"],
-        category: "Roads",
+        category: "Billing",
         assignee: "me",
         page: 1,
         pageSize: 20,

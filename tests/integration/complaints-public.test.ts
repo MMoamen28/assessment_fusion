@@ -123,10 +123,11 @@ describe("Public Complaint & Lookup Integration", () => {
     const complaint = await createDbComplaint({
       title: "Public Water Leak Title",
       description: "Public description of the burst water pipe on Main St",
-      category: "Utilities",
+      category: "Service",
       submitterName: sensitiveName,
       submitterEmail: sensitiveEmail,
       assigneeId: staff.id,
+      status: "IN_REVIEW",
       version: 3,
     });
 
