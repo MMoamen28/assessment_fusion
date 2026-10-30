@@ -3,13 +3,14 @@ import type { SessionUser } from "@/lib/auth/session";
 import { canComment } from "@/lib/domain/permissions";
 import { NotFoundError, ForbiddenError } from "@/lib/errors";
 import type { AddCommentInput } from "@/lib/validation/complaint";
+import { eventBus } from "@/lib/realtime/bus";
 
 export async function addComment(
   actor: SessionUser,
   complaintId: string,
   input: AddCommentInput,
 ) {
-  return prisma.$transaction(async (tx) => {
+  const comment = await prisma.$transaction(async (tx) => {
     const complaint = await tx.complaint.findUnique({
       where: { id: complaintId },
       select: { id: true, status: true, assigneeId: true },
@@ -46,4 +47,13 @@ export async function addComment(
     });
     return comment;
   });
+
+  eventBus.publish({
+    type: "comment.added",
+    complaintId,
+    publicVisible: !input.internal,
+    at: new Date().toISOString(),
+  });
+
+  return comment;
 }

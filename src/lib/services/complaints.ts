@@ -4,6 +4,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { generateReference, generatePublicToken } from "@/lib/ids";
 import { canAssign, canChangeStatus, canChangePriority } from "@/lib/domain/permissions";
 import { checkTransition } from "@/lib/domain/workflow";
+import { eventBus } from "@/lib/realtime/bus";
 import {
   NotFoundError,
   ForbiddenError,
@@ -52,7 +53,7 @@ export async function createComplaint(
       const reference = generateReference();
       const publicToken = generatePublicToken();
 
-      return await prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx) => {
         const complaint = await tx.complaint.create({
           data: {
             reference,
@@ -80,6 +81,15 @@ export async function createComplaint(
 
         return { id: complaint.id, reference, publicToken };
       });
+
+      eventBus.publish({
+        type: "complaint.created",
+        complaintId: result.id,
+        publicVisible: false,
+        at: new Date().toISOString(),
+      });
+
+      return result;
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -95,7 +105,7 @@ export async function createComplaint(
 }
 
 export async function claimComplaint(actor: SessionUser, id: string) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Atomic claim via conditional UPDATE: PostgreSQL row-level locks the row and matches only
     // if status is OPEN and assigneeId is null. In concurrent claim attempts, only the first
     // transaction modifies the row (count = 1); all subsequent callers get count = 0 and fail
@@ -141,6 +151,15 @@ export async function claimComplaint(actor: SessionUser, id: string) {
 
     return { success: true };
   });
+
+  eventBus.publish({
+    type: "complaint.updated",
+    complaintId: id,
+    publicVisible: true,
+    at: new Date().toISOString(),
+  });
+
+  return result;
 }
 
 export async function assignComplaint(
@@ -149,7 +168,8 @@ export async function assignComplaint(
   assigneeId: string,
   expectedVersion: number,
 ) {
-  return prisma.$transaction(async (tx) => {
+  let isOpening = false;
+  const result = await prisma.$transaction(async (tx) => {
     const complaint = await tx.complaint.findUnique({ where: { id } });
     if (!complaint) {
       throw new NotFoundError("Complaint not found");
@@ -169,7 +189,7 @@ export async function assignComplaint(
       throw new NotFoundError("Assignee not found");
     }
 
-    const isOpening = complaint.status === "OPEN";
+    isOpening = complaint.status === "OPEN";
     const updateData: Prisma.ComplaintUncheckedUpdateManyInput = isOpening
       ? {
           assigneeId,
@@ -221,6 +241,15 @@ export async function assignComplaint(
 
     return { success: true };
   });
+
+  eventBus.publish({
+    type: "complaint.updated",
+    complaintId: id,
+    publicVisible: isOpening,
+    at: new Date().toISOString(),
+  });
+
+  return result;
 }
 
 export async function changeStatus(
@@ -289,6 +318,15 @@ export async function changeStatus(
 
     return { success: true };
   });
+
+  eventBus.publish({
+    type: "complaint.updated",
+    complaintId: id,
+    publicVisible: true,
+    at: new Date().toISOString(),
+  });
+
+  return result;
 }
 
 export async function changePriority(
@@ -296,7 +334,7 @@ export async function changePriority(
   id: string,
   input: ChangePriorityInput,
 ) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const complaint = await tx.complaint.findUnique({ where: { id } });
     if (!complaint) {
       throw new NotFoundError("Complaint not found");
@@ -344,6 +382,15 @@ export async function changePriority(
 
     return { success: true };
   });
+
+  eventBus.publish({
+    type: "complaint.updated",
+    complaintId: id,
+    publicVisible: true,
+    at: new Date().toISOString(),
+  });
+
+  return result;
 }
 
 export async function listComplaints(filters: ListQueryInput, actor: SessionUser) {

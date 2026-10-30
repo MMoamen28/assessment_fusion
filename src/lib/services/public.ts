@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NotFoundError, ConflictError } from "@/lib/errors";
 import { addCommentSchema } from "@/lib/validation/complaint";
+import { eventBus } from "@/lib/realtime/bus";
 import {
   publicComplaintSelect,
   toPublicComplaintDto,
@@ -48,7 +49,8 @@ export async function addComplainantComment(
 ): Promise<PublicCommentDto> {
   const trimmedBody = addCommentSchema.shape.body.parse(body);
 
-  return prisma.$transaction(async (tx) => {
+  let complaintId = "";
+  const commentDto = await prisma.$transaction(async (tx) => {
     const complaint = await tx.complaint.findUnique({
       where: { publicToken },
       select: { id: true, status: true },
@@ -61,6 +63,8 @@ export async function addComplainantComment(
     if (complaint.status === "CLOSED" || complaint.status === "REJECTED") {
       throw new ConflictError("This complaint is closed and no longer accepts replies");
     }
+
+    complaintId = complaint.id;
 
     const comment = await tx.comment.create({
       data: {
@@ -90,4 +94,13 @@ export async function addComplainantComment(
       authorRole: "Complainant",
     };
   });
+
+  eventBus.publish({
+    type: "comment.added",
+    complaintId,
+    publicVisible: true,
+    at: new Date().toISOString(),
+  });
+
+  return commentDto;
 }
